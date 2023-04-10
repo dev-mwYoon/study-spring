@@ -1,0 +1,5 @@
+# lnk
+*.lnk
+
+# resource
+resource/
