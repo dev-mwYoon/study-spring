@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.ex02.mapper.OrderMapper">
+    <insert id="insert">
+        insert into tbl_order
+        (product_id, product_count)
+        values(#{productId}, #{productCount})
+    </insert>
+
+    <delete id="delete">
+        delete from tbl_order
+        where order_id=#{orderId}
+    </delete>
+
+    <select id="select" resultType="orderDTO">
+        select o.order_id , o.product_id , o.product_count , o.order_date , p.product_price , (o.product_count * p.product_price) as order_total
+        from tbl_product p join tbl_order o
+        on  p.product_id = o.product_id
+        and o.order_id = #{orderId}
+    </select>
+
+    <select id="selectAll" resultType="orderDTO">
+        select o.order_id , o.product_id , o.product_count , o.order_date , p.product_price , (o.product_count * p.product_price) as order_total
+        from tbl_product p join tbl_order o
+        on  p.product_id = o.product_id
+    </select>
+</mapper>

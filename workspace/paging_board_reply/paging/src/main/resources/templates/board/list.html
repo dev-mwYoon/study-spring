@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>게시글 목록</title>
+    <style>
+        ul {
+            list-style: none;
+        }
+
+        #paging {
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <!--검색-->
+        <header>
+            <form action="/board/list" name="search-form">
+                <input type="hidden" name="page" th:value="${criteria.page}">
+                <input type="checkbox" name="nicknames" value="뽀삐"> 뽀삐
+                <input type="checkbox" name="nicknames" value="철수"> 철수
+                <input type="checkbox" name="nicknames" value="벅벅코딩"> 벅벅코딩
+                <select name="order">
+                    <option value="recent" th:selected="${search.order} == 'recent'">최신순</option>
+                    <option value="star" th:selected="${search.order} == 'star'">별점순</option>
+                </select>
+                <input type="text" name="keyword" placeholder="검색어를 입력해주세요." th:value="${search.keyword}">
+                <input type="submit" value="검색">
+            </form>
+        </header>
+        <!--목록-->
+        <section>
+            <ul>
+                <th:block th:each="board: ${boards}">
+                    <li>
+                        <span th:text="${board.boardId}"></span>
+                        <a th:href="@{/board/detail(boardId=${board.boardId})}"><span th:text="${board.boardTitle}"></span></a>
+                        <span th:text="${board.boardGradeStar}"></span>
+                        <span th:text="${board.memberNickname}"></span>
+                    </li>
+                </th:block>
+            </ul>
+        </section>
+        <!--페이징-->
+        <section>
+            <a class="change-page" th:href="@{${criteria.startPage - 1}}" th:if="${criteria.prev}">[이전]</a>
+            <ul id="paging">
+            <th:block th:each="page : ${#numbers.sequence(criteria.startPage, criteria.endPage)}">
+                <a class="change-page" th:if="${criteria.page != page}" th:href="@{${page}}"><li th:text="${page}"></li></a>
+                <li th:unless="${criteria.page != page}" th:text="${page}"></li>
+            </th:block>
+            </ul>
+            <a class="change-page" th:href="@{${criteria.endPage + 1}}" th:if="${criteria.next}">[다음]</a>
+        </section>
+    </main>
+</body>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script th:inline="javascript">
+    let nicknames = [[${search.nicknames}]];
+    const $checkboxes = $("input[name='nicknames']");
+    const $changePageTags = $(".change-page");
+    const $selectTag = $("select[name='order']");
+
+    $selectTag.on("change", () => {
+        $("form[name='search-form']").submit();
+    });
+
+    $checkboxes.each(function(i, checkbox){
+        $(checkbox).on("click", () => {
+            $("form[name='search-form']").submit();
+        })
+    })
+
+    $changePageTags.each(function(i, changePageTag){
+       $(changePageTag).on("click", e => {
+           e.preventDefault();
+           $("input[name='page']").val($(this).attr("href"));
+           $("form[name='search-form']").submit();
+       })
+    });
+
+    for(let i=0; i<nicknames.length; i++){
+        for(let j=0; j<$checkboxes.length; j++){
+            if(nicknames[i] == $checkboxes.eq(j).val()){
+                $checkboxes[j].checked = true;
+            }
+        }
+    }
+</script>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

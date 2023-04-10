@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>게시글 상세보기</title>
+</head>
+<body>
+<!--게시글 정보-->
+<section th:object="${boardDTO}">
+    <ul>
+        <li th:text="*{boardId}"></li>
+        <li th:text="*{boardTitle}"></li>
+        <li th:text="*{memberNickname}"></li>
+        <li th:text="*{boardContent}"></li>
+        <li>
+            <th:block th:each="i:${#numbers.sequence(1, boardDTO.boardGradeStar)}">
+                ★
+            </th:block>
+        </li>
+    </ul>
+</section>
+
+<!--댓글 목록-->
+<section>
+    <ul id="replies"></ul>
+</section>
+</body>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script th:inline="javascript">
+    let page = 1;
+    let boardId = [[${boardDTO.boardId}]];
+    const $ul = $("#replies");
+    const replyService = (() => {
+        function getList(callback){
+            $.ajax({
+                url: `/replies/list?page=${page}&boardId=${boardId}`,
+                success: function(replies){
+                    if(callback){
+                        callback(replies);
+                    }
+                }
+            });
+        }
+        return {getList: getList};
+    })();
+
+    showList();
+
+    $(window).scroll(
+        function() {
+            if (Math.ceil($(window).scrollTop()) == $(document).height() - $(window).height()) {
+                page++;
+                showList();
+            }
+        }
+    );
+
+    function showList(){
+        replyService.getList(replies => {
+            let text = "";
+            replies.forEach(reply => {
+                text += `<li>${reply.replyContent}</li>`
+            });
+            $ul.append(text);
+        });
+    }
+
+</script>
+</html>

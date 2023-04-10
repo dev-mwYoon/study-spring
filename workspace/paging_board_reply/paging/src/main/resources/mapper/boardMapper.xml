@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.paging.mapper.BoardMapper">
+
+    <sql id="search">
+        <if test="search != null">
+        <if test="search.keyword != null">
+            <trim prefix="and (" suffix=")">
+                board_title like concat('%',#{search.keyword},'%') or board_content like concat('%',#{search.keyword},'%')
+            </trim>
+        </if>
+        <if test="search.nicknames != null">
+            <trim prefix="and (" suffix=")" prefixOverrides="or">
+                <foreach item="nickname" collection="search.nicknames">
+                    <trim prefix="or">
+                        member_nickname like concat('%', #{nickname}, '%')
+                    </trim>
+                </foreach>
+            </trim>
+        </if>
+        </if>
+    </sql>
+
+    <select id="select" resultType="boardDTO">
+        select board_id, board_title, board_content, board_grade_star, board_status, b.member_id, member_identification, member_nickname
+        from tbl_member m join tbl_board b
+        on m.member_id = b.member_id
+        where b.board_id = #{boardId}
+    </select>
+
+    <select id="selectAll" resultType="boardDTO">
+        select board_id, board_title, board_content, board_grade_star, board_status, b.member_id, member_identification, member_nickname
+        from tbl_member m join tbl_board b
+        on m.member_id = b.member_id and board_status = 0
+        <include refid="search"/>
+        order by
+        <choose>
+            <when test="search.order == 'recent'.toString()">board_id </when>
+            <otherwise>board_grade_star desc, board_id </otherwise>
+        </choose>
+        desc
+        limit #{cri.offset}, #{cri.rowCount}
+    </select>
+
+    <select id="selectTotal" resultType="_int">
+        select count(board_id) from tbl_member m join tbl_board b
+        on m.member_id = b.member_id
+        <where>
+            <include refid="search"/>
+        </where>
+    </select>
+</mapper>

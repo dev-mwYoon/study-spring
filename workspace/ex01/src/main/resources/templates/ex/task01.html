@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>task01</title>
+</head>
+<body>
+    <form name="marketVO" action="/ex/task01" method="post">
+        상품명 : <input type="text" name="productName"> <br>
+        상품가격 : <input type="text" name="productPrice"> <br>
+        상품재고 : <input type="text" name="productStock"> <br>
+        상품브랜드 : <input type="text" name="productBrand"> <br>
+        <input type="submit" value="submit"/><br>
+    </form>
+    <div>
+        상품명:<span th:text="${name}"></span> <br>
+        상품가격:<span th:text="${price}"></span> <br>
+        상품재고:<span th:text="${stock}"></span> <br>
+        상품브랜드:<span th:text="${brand}"></span> <br>
+    </div>
+</body>
+</html>
